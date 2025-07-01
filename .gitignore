@@ -1,0 +1,17 @@
+# Helm template output
+*.tgz
+charts/
+tmpcharts/
+
+# IDE/filesystem noise
+.DS_Store
+.idea/
+.vscode/
+
+# Helm secrets (if used)
+secrets.yaml
+secrets.enc.yaml
+
+# OS-generated files
+Thumbs.db
+

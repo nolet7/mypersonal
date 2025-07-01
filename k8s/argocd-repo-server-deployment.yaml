@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-repo-server
+    app.kubernetes.io/part-of: argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-repo-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: argocd-repo-server
+        app.kubernetes.io/part-of: argocd
+    spec:
+      serviceAccountName: argocd-repo-server
+      dnsPolicy: ClusterFirst
+      containers:
+        - name: argocd-repo-server
+          image: quay.io/argoproj/argocd:v2.11.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+              name: server
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - mountPath: /app/config/ssh
+              name: ssh-known-hosts
+            - mountPath: /app/config/tls
+              name: tls-certs
+            - mountPath: /app/config/gpg/source
+              name: gpg-keys
+            - mountPath: /app/config/gpg/keys
+              name: gpg-keyring
+            - mountPath: /app/config/reposerver/tls
+              name: argocd-repo-server-tls
+            - mountPath: /tmp
+              name: repo-storage
+            - mountPath: /helm-working-dir
+              name: helm-working-dir
+            - mountPath: /home/argocd/cmp-server/plugins
+              name: plugins
+      volumes:
+        - name: ssh-known-hosts
+          emptyDir: {}
+        - name: tls-certs
+          emptyDir: {}
+        - name: gpg-keys
+          emptyDir: {}
+        - name: gpg-keyring
+          emptyDir: {}
+        - name: argocd-repo-server-tls
+          emptyDir: {}
+        - name: helm-working-dir
+          emptyDir: {}
+        - name: plugins
+          emptyDir: {}
+        - name: repo-storage
+          persistentVolumeClaim:
+            claimName: argocd-repo-server-pvc
+

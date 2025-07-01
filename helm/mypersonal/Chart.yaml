@@ -1,0 +1,7 @@
+apiVersion: v2
+name: mypersonal
+description: A Helm chart for deploying the mypersonal app
+type: application
+version: 0.1.0
+appVersion: "1.0"
+

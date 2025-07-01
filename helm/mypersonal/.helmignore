@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.git/
+*.tgz
+*.tar
+*.tar.gz
+*.zip
+Dockerfile
+*.md
+.vscode/

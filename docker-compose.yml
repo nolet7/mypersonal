@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  skillflight-web:
+    image: nginx:alpine
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dist:/usr/share/nginx/html:ro  # Adjust this if your build folder is not named "dist"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - skillflight-db
+    networks:
+      - skillflight-network
+
+  skillflight-db:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: skilluser
+      POSTGRES_PASSWORD: flightpass2024
+      POSTGRES_DB: skillflight
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - skillflight_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - skillflight-network
+
+volumes:
+  skillflight_data:
+    driver: local
+
+networks:
+  skillflight-network:
+    driver: bridge
+
